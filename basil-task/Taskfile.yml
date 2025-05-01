@@ -1,0 +1,27 @@
+version: '3'
+
+tasks:
+  sh:
+    cmds:
+      - '{{.CLI_ARGS}}'
+  up:
+    cmds:
+      - printf '>%s< ' {{.CLI_ARGS}}
+  ddisasm:
+    requires:
+      vars: [BIN]
+    cmds:
+      - ddisasm {{.BIN}} --ir a.gtirb
+      - ls -l
+  gts:
+    deps: [ddisasm]
+    cmds:
+      - gtirb-semantics a.gtirb a.gts
+      - ls -l
+  debug-gts:
+    deps: [gts]
+    requires:
+      vars: [OUT]
+    cmds:
+      - debug-gts.py a.gts > {{.OUT}}
+
