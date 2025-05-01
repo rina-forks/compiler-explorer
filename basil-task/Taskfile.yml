@@ -10,6 +10,7 @@ tasks:
   ddisasm:
     requires:
       vars: [BIN]
+    sources: ['{{.BIN}}']
     cmds:
       - ddisasm {{.BIN}} --ir a.gtirb
       - ls -l
