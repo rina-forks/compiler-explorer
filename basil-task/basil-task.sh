@@ -1,7 +1,12 @@
 #!/bin/bash -eu
 # vim: sts=2 ts=2 sw=2 et
 
+# get last command-line argument
 export BIN="${@: -1}"
+
+# remove last command-line argument from the "$@" list
+set -- "${@: 1: $#-1}"
+
 export NO_COLOR=1
 mkdir -p .godbolt-out
 export OUT=$(mktemp -p .godbolt-out --suffix=-out)
@@ -13,13 +18,14 @@ export LOG=$(mktemp -p .godbolt-out --suffix=-log)
 # (or all files in the directory?)
 # (how would this interact with spec files?)
 
-# export TASK_TEMP_DIR=/tmp/task
-
 [[ -n "$OUT" ]] && [[ -n "$BIN" ]] && [[ -n "$LOG" ]]
 
 task_cmd=(task --taskfile "$(dirname "$0")/Taskfile.yml" --dir "$(pwd)" "$@")
 
 print_log_reason=''
+
+
+date
 
 if mutex.sh "${task_cmd[@]}" > $LOG 2>&1; then
   if [[ -s "$OUT" ]]; then
@@ -30,8 +36,6 @@ if mutex.sh "${task_cmd[@]}" > $LOG 2>&1; then
 else
   print_log_reason="ERROR while"
 fi
-
-date
 
 if [[ -n "$print_log_reason" ]]; then
   echo "$print_log_reason" 'executing command:'

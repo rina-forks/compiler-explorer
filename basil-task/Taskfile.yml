@@ -4,25 +4,76 @@ tasks:
   sh:
     cmds:
       - '{{.CLI_ARGS}}'
-  up:
-    cmds:
-      - printf '>%s< ' {{.CLI_ARGS}}
-  ddisasm:
+  # print:
+  #   desc: Runs the given task, then prints the given file.
+
+  bin:
     requires:
       vars: [BIN]
     sources: ['{{.BIN}}']
     cmds:
-      - ddisasm {{.BIN}} --ir a.gtirb
+      - cp '{{.BIN}}' a.out
+
+  print:
+    desc: |
+      Runs the given task, then prints the given file.
+      Usage: print -- [TASK] [FILE]
+    vars:
+      task: '{{.CLI_ARGS | splitArgs | first}}'
+      files: '{{.CLI_ARGS | splitArgs | rest | join " "}}'
+    cmds:
+      - task: '{{.task}}'
+        vars: {CLI_ARGS: ''}
+      - cat {{.files}} >> {{.OUT}}
+      - |
+        if [[ -z "{{.files}}" ]]; then
+          echo 'usage: print -- [TASK NAME] [FILES...]' >> {{.OUT}}
+          echo >> {{.OUT}}
+          echo 'available files:' >> {{.OUT}}
+          echo >> {{.OUT}}
+          ls -l >> {{.OUT}}
+        fi
+
+  ddisasm:
+    desc: Run ddisasm disassembler.
+    deps: [bin]
+    sources: [a.out]
+    cmds:
+      - ddisasm a.out --ir a.gtirb
       - ls -l
   gts:
+    desc: Run gtirb-semantics tool.
     deps: [ddisasm]
+    sources: [a.gtirb]
     cmds:
       - gtirb-semantics a.gtirb a.gts
       - ls -l
+
   debug-gts:
+    desc: Print gtirb-semantics output as JSON.
     deps: [gts]
-    requires:
-      vars: [OUT]
+    sources: [a.gts]
     cmds:
-      - debug-gts.py a.gts > {{.OUT}}
+      - debug-gts.py a.gts >> {{.OUT}}
+
+  relf:
+    desc: Run readelf tool.
+    deps: [bin]
+    sources: [a.out]
+    cmds:
+      - aarch64-unknown-linux-gnu-readelf -s -r -W a.out > a.relf
+
+  basil:
+    desc: Run Basil.
+    deps: [relf, gts]
+    sources: [a.gts, a.relf]
+    cmds:
+      - basil --relf a.relf -i a.gts -o a.bpl {{.CLI_ARGS}}
+
+  bpl:
+    desc: Print Boogie file.
+    deps: [basil]
+    sources: [a.bpl]
+    cmds:
+      - cat a.bpl >> {{.OUT}}
 

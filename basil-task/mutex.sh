@@ -5,7 +5,7 @@
 
 # lock="./.lock-$@"
 # lock="${lock//\//_}"
-lock="${LOCK:-./lock}"
+lock="${LOCK:-./.lock}"
 
 : >> "$lock"
 {
