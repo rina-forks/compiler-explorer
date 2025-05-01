@@ -27,7 +27,7 @@ print_log_reason=''
 
 date
 
-if mutex.sh "${task_cmd[@]}" > $LOG 2>&1; then
+if "${task_cmd[@]}" > $LOG 2>&1; then
   if [[ -s "$OUT" ]]; then
     cat "$OUT"
   else
