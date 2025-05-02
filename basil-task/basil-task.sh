@@ -29,8 +29,12 @@ if [[ "$verbose" == 1 ]]; then
   print_log_reason='verbosely'
 fi
 
-"${task_cmd[@]}" > $LOG 2>&1 || true
-code=$?
+if "${task_cmd[@]}" > $LOG 2>&1; then
+  code=$?
+else
+  code=$?
+fi
+
 if [[ -s "$OUT" ]]; then
   cat "$OUT"
   echo

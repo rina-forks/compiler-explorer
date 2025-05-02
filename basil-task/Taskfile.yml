@@ -10,8 +10,6 @@ tasks:
       Example: shell -- ls -l
     cmds:
       - '{{.CLI_ARGS}}'
-  # print:
-  #   desc: Runs the given task, then prints the given file.
 
   bin:
     requires:
