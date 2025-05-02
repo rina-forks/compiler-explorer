@@ -25,7 +25,7 @@ export LOG=$(mktemp -p .godbolt-out --suffix=-log)
 task_cmd=(task --taskfile "$(dirname "$0")/Taskfile.yml" --dir "$(pwd)" "$@")
 
 print_log_reason=''
-if [[ "$verbose" == 1 ]]; then
+if [[ "${verbose:-}" == 1 ]]; then
   print_log_reason='verbosely'
 fi
 

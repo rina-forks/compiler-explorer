@@ -92,4 +92,8 @@ tasks:
     deps: [basil]
     cmds: ['boogie a.bpl {{.boogie_args}} /mv counterexample.model &>> {{.OUT}}']
 
+  version:
+    desc: Print tool versions.
+    cmds:
+      - command -v basil boogie aslp gtirb-semantics ddisasm
 
