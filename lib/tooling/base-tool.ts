@@ -26,6 +26,7 @@ import path from 'node:path';
 
 import PromClient from 'prom-client';
 import _ from 'underscore';
+import which from 'which';
 
 import {CompilationInfo, ExecutionOptions} from '../../types/compilation/compilation.interfaces.js';
 import {UnprocessedExecResult} from '../../types/execution/execution.interfaces.js';
@@ -179,10 +180,11 @@ export class BaseTool implements ITool {
         if (inputFilepath && !dontAppendInputFilepath) args.push(inputFilepath);
 
         const toolExe = this.getToolExe(compilationInfo);
-        const exeDir = path.dirname(toolExe);
+        const fullToolExe = which.sync(toolExe, {nothrow: true}) ?? toolExe;
+        const exeDir = path.dirname(fullToolExe);
 
         try {
-            const result = await this.exec(toolExe, args, execOptions);
+            const result = await this.exec(fullToolExe, args, execOptions);
             return this.convertResult(result, inputFilepath, exeDir);
         } catch (e) {
             logger.error('Error while running tool: ', e);
