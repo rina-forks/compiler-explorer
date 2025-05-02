@@ -20,21 +20,24 @@ export LOG=$(mktemp -p .godbolt-out --suffix=-log)
 
 [[ -n "$OUT" ]] && [[ -n "$BIN" ]] && [[ -n "$LOG" ]]
 
+. .env
+
 task_cmd=(task --taskfile "$(dirname "$0")/Taskfile.yml" --dir "$(pwd)" "$@")
 
 print_log_reason=''
+if [[ "$verbose" == 1 ]]; then
+  print_log_reason='verbosely'
+fi
 
-
-date
-
-if "${task_cmd[@]}" > $LOG 2>&1; then
-  if [[ -s "$OUT" ]]; then
-    cat "$OUT"
-  else
-    print_log_reason='successful, but no output file from'
-  fi
+"${task_cmd[@]}" > $LOG 2>&1 || true
+code=$?
+if [[ -s "$OUT" ]]; then
+  cat "$OUT"
+  echo
+elif [[ "$code" == 0 ]]; then
+  print_log_reason='successful, but no output file from'
 else
-  print_log_reason="ERROR while"
+  print_log_reason="ERROR, while"
 fi
 
 if [[ -n "$print_log_reason" ]]; then
@@ -42,6 +45,7 @@ if [[ -n "$print_log_reason" ]]; then
   echo
   printf '  '; printf '%q ' "${task_cmd[@]}"; echo
   echo
+  echo "at $(date),"
   echo "in directory $(pwd)"
   echo
   echo 'command output:'
@@ -49,3 +53,4 @@ if [[ -n "$print_log_reason" ]]; then
   cat "$LOG"
 fi
 
+exit "$code"

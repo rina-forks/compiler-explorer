@@ -1,7 +1,13 @@
 version: '3'
 
+dotenv:
+  - ".env"
+
 tasks:
   sh:
+    desc: |
+      Runs the given shell command.
+      Example: shell -- ls -l
     cmds:
       - '{{.CLI_ARGS}}'
   # print:
@@ -39,41 +45,53 @@ tasks:
     deps: [bin]
     # sources: [a.out]
     cmds:
-      - mutex.sh ddisasm a.out --ir a.gtirb
-      - ls -l
+      - mutex.sh ddisasm a.out --ir a.gtirb {{.ddisasm_args}}
   gts:
     desc: Run gtirb-semantics tool.
     deps: [ddisasm]
     # sources: [a.gtirb]
     cmds:
-      - mutex.sh gtirb-semantics a.gtirb a.gts
-      - ls -l
+      - mutex.sh gtirb-semantics a.gtirb a.gts {{.gts_args}}
 
   debug-gts:
     desc: Print gtirb-semantics output as JSON.
     deps: [gts]
     # sources: [a.gts]
     cmds:
-      - debug-gts.py a.gts >> {{.OUT}}
+      - debug-gts.py a.gts {{.debug_gts_args}} >> {{.OUT}}
 
   relf:
     desc: Run readelf tool.
     deps: [bin]
     # sources: [a.out]
     cmds:
-      - mutex.sh sh -c 'aarch64-unknown-linux-gnu-readelf -s -r -W a.out > a.relf'
+      - mutex.sh sh -c 'aarch64-unknown-linux-gnu-readelf -s -r -W a.out {{.relf_args}} > a.relf'
 
   basil:
     desc: Run Basil.
     deps: [relf, gts]
     # sources: [a.gts, a.relf]
     cmds:
-      - mutex.sh basil --relf a.relf -i a.gts -o a.bpl {{.CLI_ARGS}}
+      - mutex.sh basil --relf a.relf -i a.gts -o a.bpl --dump-il a {{.basil_args}}
 
   bpl:
     desc: Print Boogie file.
     deps: [basil]
-    # sources: [a.bpl]
-    cmds:
-      - cat a.bpl >> {{.OUT}}
+    cmds: ['cat a.bpl >> {{.OUT}}']
+
+  il:
+    desc: Print Basil IL file.
+    deps: [basil]
+    cmds: ['cat a-output.il >> {{.OUT}}']
+
+  dsl:
+    desc: Print Basil DSL file.
+    deps: [basil]
+    cmds: ['cat a-output.scala >> {{.OUT}}']
+
+  boogie:
+    desc: Run Boogie verifier on Basil output.
+    deps: [basil]
+    cmds: ['boogie a.bpl {{.boogie_args}} /mv counterexample.model &>> {{.OUT}}']
+
 
