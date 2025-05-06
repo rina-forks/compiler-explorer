@@ -20,6 +20,7 @@ export LOG=$(mktemp -p .godbolt-out --suffix=-log)
 
 [[ -n "$OUT" ]] && [[ -n "$BIN" ]] && [[ -n "$LOG" ]]
 
+: >> .env
 . .env
 
 task_cmd=(task --taskfile "$(dirname "$0")/Taskfile.yml" --dir "$(pwd)" "$@")

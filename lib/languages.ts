@@ -43,6 +43,17 @@ type DefKeys =
 type LanguageDefinition = Pick<Language, DefKeys>;
 
 const definitions: Record<LanguageKey, LanguageDefinition> = {
+    boogie: {
+        name: 'Boogie IVL',
+        monaco: 'cppp',
+        extensions: ['.bpl'],
+        alias: [],
+        logoUrl: '',
+        logoUrlDark: null,
+        formatter: null,
+        previewFilter: null,
+        monacoDisassembly: 'cppp',
+    },
     coccinelle_for_c: {
         name: 'C with Coccinelle',
         monaco: 'nc',

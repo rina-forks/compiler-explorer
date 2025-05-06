@@ -70,12 +70,12 @@ tasks:
     deps: [relf, gts]
     # sources: [a.gts, a.relf]
     cmds:
-      - mutex.sh basil --relf a.relf -i a.gts -o a.bpl --dump-il a {{.basil_args}}
+      - mutex.sh basil --relf a.relf -i a.gts -o example.bpl --dump-il a {{.basil_args}}
 
   bpl:
     desc: Print Boogie file.
     deps: [basil]
-    cmds: ['cat a.bpl >> {{.OUT}}']
+    cmds: ['cat example.bpl >> {{.OUT}}']
 
   il:
     desc: Print Basil IL file.
@@ -90,7 +90,14 @@ tasks:
   boogie:
     desc: Run Boogie verifier on Basil output.
     deps: [basil]
-    cmds: ['boogie a.bpl {{.boogie_args}} /mv counterexample.model &>> {{.OUT}}']
+    cmds:
+      - task: boogie-only
+      - 'cat boogie.out >> {{.OUT}}'
+
+  boogie-only:
+    desc: Run Boogie verifier on a .bpl file.
+    cmds:
+      - 'time boogie example.bpl {{.boogie_args}} /mv counterexample.model &>> boogie.out'
 
   version:
     desc: Print tool versions.
