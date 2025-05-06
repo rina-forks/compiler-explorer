@@ -23,6 +23,13 @@ export LOG=$(mktemp -p .godbolt-out --suffix=-log)
 : >> .env
 . .env
 
+(
+  cd /tmp
+  set +e
+  # XXX: race condition during server startup?
+  nohup gtirb-semantics --serve 2>&1 &
+)
+
 task_cmd=(task --taskfile "$(dirname "$0")/Taskfile.yml" --dir "$(pwd)" "$@")
 
 print_log_reason=''
