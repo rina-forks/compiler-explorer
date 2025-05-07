@@ -48,10 +48,8 @@ tasks:
     desc: Run gtirb-semantics tool.
     deps: [ddisasm]
     # sources: [a.gtirb]
-    env:
-      GTIRB_SEM_SOCKET: /tmp/aslp_rpc_socket
     cmds:
-      - mutex.sh time gtirb-semantics --client a.gtirb a.gts {{.gts_args}}
+      - mutex.sh gtirb-semantics a.gtirb a.gts {{.gts_args}}
 
   debug-gts:
     desc: Print gtirb-semantics output as JSON.
