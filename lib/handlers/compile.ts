@@ -279,7 +279,7 @@ export class CompileHandler implements ICompileHandler {
                 const compilerObj = new compilerClass(compiler, this.compilerEnv);
                 return compilerObj.initialise(modificationTime, this.clientOptions, isPrediscovered);
             } catch (err) {
-                logger.warn(`Unable to stat ${compiler.id} compiler binary: `, err);
+                logger.warn(`Unable to stat ${compiler.id} compiler binary: ${err}`);
                 return null;
             }
         } else {
