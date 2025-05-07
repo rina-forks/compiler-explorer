@@ -23,6 +23,10 @@ export LOG=$(mktemp -p .godbolt-out --suffix=-log)
 : >> .env
 . .env
 
+if [[ -n "${GTIRB_SEM_SOCKET:-}" ]]; then
+  gts_args="${gts_args:-} --client"
+fi
+
 task_cmd=(task --taskfile "$(dirname "$0")/Taskfile.yml" --dir "$(pwd)" "$@")
 
 print_log_reason=''
