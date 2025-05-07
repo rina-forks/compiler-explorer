@@ -21,7 +21,10 @@ export LOG=$(mktemp -p .godbolt-out --suffix=-log)
 [[ -n "$OUT" ]] && [[ -n "$BIN" ]] && [[ -n "$LOG" ]]
 
 : >> .env
+
+set -a
 . .env
+set +a
 
 if [[ -n "${GTIRB_SEM_SOCKET:-}" ]]; then
   export gts_args="${gts_args:-} --client"
